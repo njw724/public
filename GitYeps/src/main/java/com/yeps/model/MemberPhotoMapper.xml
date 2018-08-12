@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yeps.model">
+
+   <insert id="insertMemberMainPhoto" parameterType="MemberPhotoDTO">
+      insert into yeps_member_photos(filenum, mnum, member_filename, origin_filename, filesize, file_upload_date, ismainphoto) values (yeps_member_photos_seq.nextval, #{mnum, jdbcType=INTEGER}, #{member_filename}, #{origin_filename}, #{filesize}, sysdate, 'y')
+   </insert>
+   
+   <insert id="insertMemberPhoto" parameterType="MemberPhotoDTO">
+      insert into yeps_member_photos(filenum, mnum, member_filename, origin_filename, filesize, file_upload_date, ismainphoto) values (yeps_member_photos_seq.nextval, #{mnum, jdbcType=INTEGER}, #{member_filename}, #{origin_filename}, #{filesize}, sysdate, 'n')
+   </insert>
+   
+   <delete id="deleteMemberPhotoToFilename" parameterType="String">
+      delete yeps_member_photos where member_filename = #{member_filename}
+   </delete>
+   
+   <select id="getMemberPhotoList" parameterType="int" resultType="MemberPhotoDTO">
+      select * from yeps_member_photos where mnum = #{mnum} order by filenum asc
+   </select>
+   
+   <select id="isExistMemberMainPhoto" parameterType="int" resultType="int">
+      select count(*) from yeps_member_photos where mnum = #{mnum} and ismainphoto = 'y'
+   </select>
+   
+   <select id="getMemberMainPhoto" parameterType="int" resultType="MemberPhotoDTO">
+      select * from yeps_member_photos where mnum = #{mnum} and ismainphoto = 'y'
+   </select>
+   
+   <update id="changeMemberMainPhoto" parameterType="int">
+        update yeps_member_photos set ismainphoto='n' where mnum=#{mnum}
+   </update>
+   
+   <update id="setMemberMainPhoto" parameterType="java.util.HashMap">
+      update yeps_member_photos set ismainphoto='y' where mnum=#{mnum} and filenum=#{filenum}
+   </update>
+   
+   <delete id="deleteMemberPhoto" parameterType="java.util.HashMap">
+        delete yeps_member_photos where mnum = #{mnum} and filenum=#{filenum}
+   </delete>
+   
+   <delete id="deleteMemberPhotosByMemberNumber" parameterType="int">
+   		delete yeps_member_photos where mnum = #{mnum}
+   </delete>
+   <!--
+   
+   <select id="getFile" parameterType="java.util.HashMap" resultType="FileDTO">
+      select * from yeps_files where filename = #{filename, jdbcType=VARCHAR} or filenum = #{filenum, jdbcType=INTEGER} order by filenum desc
+   </select>
+   
+   <delete id="deleteFile" parameterType="int">
+      delete yeps_files where filenum = #{filenum}
+   </delete>
+   
+   <select id="getfileListForMe" parameterType="java.util.HashMap" resultType="FileDTO">
+      select * from yeps_files where evnum = #{evnum} and mnum = #{mnum} order by filenum desc
+   </select>
+   
+   <select id="getFYIEventFile" parameterType="int" resultType="FileDTO">
+      select * from yeps_files where evnum = #{evnum} and rownum = 1 order by filenum asc
+   </select>
+   
+    -->
+</mapper>

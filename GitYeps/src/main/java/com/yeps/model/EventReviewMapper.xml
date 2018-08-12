@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yeps.model">
+
+
+<!-- 	<select id="listEventReview" parameterType="int" resultType="EventReviewDTO"> -->
+<!-- 		select * from yeps_eventreview where evnum = #{evnum} order by eventReview_num asc -->
+<!-- 	</select> -->
+	
+	<insert id="insertEventReview" parameterType="java.util.HashMap">
+		insert into yeps_eventreview values (yeps_eventreview_seq.nextval, #{evnum}, #{mnum}, (select email from yeps_member where mnum = #{mnum}), #{eventReview_content}, to_date(sysdate, 'yyyy/mm/dd hh24:mi:ss'), #{ip})
+	</insert>
+	
+	<delete id="deleteAllEventReivew" parameterType="int">
+		delete yeps_eventreview where evnum = #{evnum}
+	</delete>
+	
+	<delete id="deleteEventReview" parameterType="int">
+	    delete yeps_eventreview where eventReview_num = #{eventReview_num}
+	    </delete>
+	
+		<resultMap type="eventReviewDTO" id="EventReview_Map">
+			<id column="eventReview_num" property="eventReview_num"/>
+			<result column="evnum" property="evnum"></result>
+			<result column="mnum" property="mnum"></result>
+			<result column="eventReview_writer" property="eventReview_writer"></result>
+			<result column="eventReview_content" property="eventReview_content"></result>
+			<result column="eventReview_writedate" property="eventReview_writedate"></result>
+		
+	        <association javaType="EventDTO" property="eventDTO">
+				<id column="evnum" property="evnum"></id>
+				<result column="eventname" property="eventname"></result>
+			</association>
+		</resultMap>
+			
+	<select id="eventReviewList" parameterType="java.util.HashMap" resultMap="EventReview_Map">
+	    select * from (select rownum rn, A.* from (select
+  		 		ER.evnum
+        		, ER.mnum
+        		, ER.eventReview_num
+        		, ER.eventReview_writer
+        		, ER.eventReview_content
+        		, ER.eventReview_writedate
+        		, EV.eventname
+        from	yeps_eventreview ER, yeps_event EV where ER.evnum = EV.evnum and EV.evnum = ER.evnum order by ER.eventReview_num desc)A)
+        where rn between #{start} and #{end}
+	 </select>
+	 
+	 <select id="getEventReview" resultType="EventReviewDTO">
+	     select * from yeps_eventreview where eventReview_num = #{eventReview_num}
+	 </select>
+	 
+	 <select id="eventReviewCount" resultType="int">
+	     select count(*) from yeps_eventreview
+	 </select>
+	 
+	  <select id="getSearchEventReviewCount" parameterType="java.util.HashMap" resultType="int">
+      select count(*) from yeps_eventreview where ${search} like '%'||#{searchString}||'%'
+   </select>
+   
+   <resultMap type="eventReviewDTO" id="findEventReview_Map">
+			<id column="eventReview_num" property="eventReview_num"/>
+			<result column="evnum" property="evnum"></result>
+			<result column="mnum" property="mnum"></result>
+			<result column="eventReview_writer" property="eventReview_writer"></result>
+			<result column="eventReview_content" property="eventReview_content"></result>
+			<result column="eventReview_writedate" property="eventReview_writedate"></result>
+		
+	        <association javaType="EventDTO" property="eventDTO">
+				<id column="evnum" property="evnum"></id>
+				<result column="eventname" property="eventname"></result>
+			</association>
+		</resultMap>
+   
+   <select id="findEventReview" parameterType="java.util.HashMap" resultMap="findEventReview_Map">
+      select * from (select rownum rn, A.* from(select 
+                     ER.evnum
+        		, ER.mnum
+        		, ER.eventReview_num
+        		, ER.eventReview_writer
+        		, ER.eventReview_content
+        		, ER.eventReview_writedate
+        		, EV.eventname
+       from yeps_eventreview ER, yeps_event EV where ER.evnum = EV.evnum and EV.evnum = ER.evnum  and  EV.eventname = eventname and  ${search} like '%'||#{searchString}||'%' order by evnum desc)A) 
+       where rn between #{startRow} and #{endRow}
+   </select>
+	
+	<delete id="deleteEventReviewByMemberNumber" parameterType="int">
+		delete yeps_eventreview where mnum = #{mnum}
+	</delete>
+	
+	<resultMap type="EventReviewDTO" id="EventReviewMap">
+  		<id column="eventReview_num" property="eventReview_num"/>
+		<result column="eventReview_num" property="eventReview_num"></result>
+		<result column="evnum" property="evnum"></result>
+		<result column="mnum" property="mnum"></result>
+		<result column="eventReview_content" property="eventReview_content"></result>
+		<result column="eventReview_writedate" property="eventReview_writedate"></result>
+		
+		<association javaType="MemberDTO" property="memberDTO">
+			<id column="mnum" property="mnum"></id>
+			<result column="email" property="email"></result>
+			<result column="reviewcount" property="reviewcount"></result>
+			<result column="imagecount" property="imagecount"></result>
+			<result column="nickname" property="nickname"></result>
+			<association javaType="MemberPhotoDTO" property="memberPhotoDTO">
+				<id column="filenum" property="filenum"></id>
+				<result column="member_filename" property="member_filename"></result>
+				<result column="ismainphoto" property="ismainphoto"></result>
+			</association>
+		</association>
+		
+		<association javaType="EventDTO" property="eventDTO">
+			<id column="evnum" property="evnum"></id>
+			<result column="evnum" property="evnum"></result>
+		</association>
+  	</resultMap>
+   
+   
+	<select id="listEventReview" parameterType="int" resultMap="EventReviewMap">
+  		 select
+  		 		ER.eventReview_num
+        		, ER.evnum
+        		, ER.mnum
+        		, ER.eventReview_writedate
+        		, ER.eventReview_content
+        		, M.email
+        		, M.reviewcount
+        		, M.imagecount
+        		, M.nickname
+        		, P.member_filename
+        from	yeps_eventreview ER, yeps_member M, yeps_member_photos P, yeps_event E
+        where	ER.mnum = M.mnum and ER.mnum = P.mnum and ER.evnum = E.evnum and P.ismainphoto = 'y' and ER.evnum = #{evnum}
+        order by ER.eventReview_num asc
+	</select>
+</mapper>

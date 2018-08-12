@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="com.yeps.model">
+
+   <select id="getMemberCount" resultType="int">
+      select count(*) from yeps_member
+   </select>
+   
+   <select id="getSearchMemberCount" parameterType="java.util.HashMap" resultType="int">
+      select count(*) from yeps_member where ${search} like '%'||#{searchString}||'%'
+   </select>
+   
+   <select id="listMember" parameterType="java.util.HashMap" resultType="MemberDTO">
+      select * from (select rownum rn, A.* from(select * from yeps_member order by mnum desc)A) 
+       where rn between #{startRow} and #{endRow}
+   </select>
+   
+   <select id="findMember" parameterType="java.util.HashMap" resultType="MemberDTO">
+      select * from (select rownum rn, A.* from(select * from yeps_member where ${search} like '%'||#{searchString}||'%' order by mnum desc)A) 
+       where rn between #{startRow} and #{endRow}
+   </select>
+   
+   <select id="getMemberProfile" parameterType="int" resultType="MemberDTO">
+      select * from yeps_member where mnum=#{mnum}
+   </select>
+
+   <select id="checkJumin" parameterType="MemberDTO" resultType="int">
+      select count(*) from yeps_member where ssn1 = #{ssn1} and ssn2 = #{ssn2}
+   </select>
+   
+   <insert id="insertMember" parameterType="MemberDTO">
+      insert into yeps_member (mnum, name, ssn1, ssn2, email, passwd, joindate, reviewcount, imagecount, ismaster,ismanager, controlcate, controlevent, controlmember, controlstore, controlreview, salt) 
+      values(yeps_member_seq.nextval,#{name},#{ssn1},#{ssn2},#{email},#{passwd},sysdate,0,0,'n','n','n','n','n','n','n',#{salt})
+   </insert>
+   
+   <select id="confirmEmail" parameterType="java.util.HashMap" resultType="MemberDTO">
+      select * from yeps_member where email=#{email}
+   </select>
+   
+   <delete id="deleteMember" parameterType="int">
+      delete from yeps_member where mnum = #{mnum} and ismaster='n'
+   </delete>
+   
+   <select id="loginMember" parameterType="MemberDTO" resultType="MemberDTO">
+        select mnum,email,name,nickname,address,ismaster,ismanager,imagecount,reviewcount,joindate from yeps_member where email = #{email} and passwd = #{passwd}
+    </select>
+    
+    <select id="getMemberByMnum" parameterType="int" resultType="MemberDTO">
+        select mnum,email,name,nickname,address,imagecount,reviewcount,joindate from yeps_member where mnum = #{mnum}
+    </select>
+    
+    <select id="getSaltByEmail" parameterType="MemberDTO" resultType="String">
+       select salt from yeps_member where email=#{email}
+    </select>
+    
+    <select id="findMemberEmail" parameterType="MemberDTO" resultType="String">
+        select email from yeps_member where name = #{name} and ssn1 = #{ssn1} and ssn2 = #{ssn2}
+    </select>
+    
+    <select id="findMemberPasswd" parameterType="MemberDTO" resultType="int">
+        select count(*) from yeps_member where name = #{name} and ssn1 = #{ssn1} and ssn2 = #{ssn2} and email = #{email}
+    </select>
+    
+    <update id="temporaryPasswd" parameterType="MemberDTO">
+       update yeps_member set passwd=#{passwd} where name = #{name} and ssn1 = #{ssn1} and ssn2 = #{ssn2} and email = #{email}
+    </update>
+    
+    <update id="updateMemberProfile" parameterType="MemberDTO">
+       update yeps_member set name=#{name}, nickname=#{nickname}, address=#{address}  where mnum=#{mnum}
+    </update>
+    
+    <update id="updateMemberProfileByMaster" parameterType="MemberDTO">
+    update yeps_member set name=#{name},nickname=#{nickname},ismanager=#{ismanager},controlcate=#{controlcate},
+    controlevent=#{controlevent},controlmember=#{controlmember},controlstore=#{controlstore},
+    controlreview=#{controlreview} where mnum=#{mnum} and ismaster='n'
+    </update>
+    
+    <update id="updateMemberPasswd" parameterType="java.util.HashMap">
+      update yeps_member set passwd=#{passwd1} where mnum=#{mnum} and passwd=#{passwd}
+   </update>
+   
+   <delete id="leaveMember" parameterType="MemberDTO">
+      delete from yeps_member where mnum = #{mnum} and passwd=#{passwd}
+   </delete>
+   
+   
+   
+   
+   <!-- -->
+
+
+
+    <select id="mylist_info" parameterType="int" resultType="MemberDTO">
+        select * from yeps_member where mnum = #{NBPmnum}
+     </select>
+
+   <select id="getMemberForEmail" parameterType="String" resultType="MemberDTO">
+      select * from yeps_member where email= #{email}
+   </select>
+
+   <select id="previous_M" parameterType="int" resultType="MemberDTO">
+      select *from yeps_member where mnum= #{mnum}
+   </select>
+
+	<select id="getSelectedRestaurant_M" parameterType="int" resultType="MemberDTO"> 
+		select * from yeps_member where mnum= #{mnum} 
+	</select>
+   
+   
+   
+   <!-- ====================================================== -->
+   
+   <select id="listMemberForMessage" resultType="MemberDTO">
+   		select * from yeps_member
+   </select>
+   
+   
+   
+   
+   
+   
+   <!-- 12월 29일 추가 -->
+	<select id="SearchedDTO_M" parameterType="int" resultType="MemberDTO"> 
+		select * from yeps_member where mnum= #{mnum} 
+	</select>
+   
+   	<update id="reviewCount" parameterType="java.util.HashMap">
+		update yeps_member set reviewcount=#{reviewcount} where mnum=#{mnum}
+	</update>
+  	
+	<select id="getMemberReviewCount" parameterType="int" resultType="int">
+		select reviewcount from yeps_member where mnum=#{mnum}
+	</select>
+   
+   
+   <!-- 1월 4일 추가 -->
+   <update id="updateImageCount" parameterType="java.util.HashMap">
+		update yeps_member set imagecount = imagecount + #{imageCount} where mnum = #{mnum}
+   </update>
+   
+</mapper>

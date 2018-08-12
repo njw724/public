@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="com.yeps.model">
+   
+   <select id="getQnACount" resultType="int">
+      select count(*) from yeps_qna
+   </select>
+   
+   <select id="getSearchQnACount" parameterType="String" resultType="int">
+      select count(*) from yeps_qna where title like '%'||#{searchString}||'%'
+   </select>
+   
+   <select id="listQnA" parameterType="java.util.HashMap" resultType="QnADTO">
+      select * from (select rownum rn, A.* from(select * from yeps_qna order by qnum desc)A) 
+       where rn between #{startRow} and #{endRow}
+   </select>
+
+   <select id="findQnA" parameterType="java.util.HashMap" resultType="QnADTO">
+      select * from (select rownum rn, A.* from(select * from yeps_qna where replace(upper(title),' ','') like '%'||replace(upper(#{searchString}),' ','')||'%' order by qnum desc)A) 
+       where rn between #{startRow} and #{endRow}
+   </select>
+   
+   <insert id="insertQnA" parameterType="QnADTO">
+      insert into yeps_qna values(yeps_qna_seq.nextval,#{mnum},#{title},#{writer},#{content}, #{secret}, sysdate, 0, #{ip}, null, null)
+   </insert>
+   
+   <update id="qnaReadCount" parameterType="int">
+      update yeps_qna set readcount=readcount+1 where qnum = #{qnum}
+   </update>
+   
+   <select id="getQnA" parameterType="int" resultType="QnADTO">
+      select * from yeps_qna where qnum = #{qnum}
+   </select>
+   
+   <select id="getQnAInfo" parameterType="int" resultType="QnADTO">
+      select writer,reply from yeps_qna where qnum = #{qnum}
+   </select>
+   
+   <delete id="deleteQnA" parameterType="int">
+      delete from yeps_qna where qnum = #{qnum}
+   </delete>
+   
+   <update id="updateQnA" parameterType="QnADTO">
+       update yeps_qna set title=#{title}, content=#{content}, secret=#{secret} where qnum = #{qnum}
+    </update>
+    
+    <update id="replyQnA" parameterType="QnADTO">
+       update yeps_qna set reply=#{reply} where qnum = #{qnum}
+    </update>
+    
+    <delete id="deleteQnAByMemberNumber" parameterType="int">
+    	delete yeps_qna where mnum = #{mnum}
+    </delete>
+   
+</mapper>

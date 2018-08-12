@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yeps.model">
+	
+	<insert id="insertLargeMenu" parameterType="LargeMenuDTO">
+		insert into yeps_largeMenu values(yeps_largeMenu_seq.nextval,#{rnum},#{large_name})
+	</insert>
+	<select id="getLastLargeMenu" resultType="int">
+		select large_menunum from (select * from yeps_largeMenu order by rownum desc) where rownum = 1
+	</select>
+	
+	
+	<select id="listLargeMenu" resultType="LargeMenuDTO">
+		select * from yeps_largeMenu where rnum=#{rnum}
+	</select>
+	
+	
+		<resultMap type="SmallMenuDTO" id="getLarge_SmallMenuMap">
+			<id column="small_menunum" property="small_menunum"/>
+			<result column="small_menunum" property="small_menunum"/>
+			<result column="large_menunum" property="large_menunum"></result>
+			<result column="small_name" property="small_name"></result>
+			<result column="small_content" property="small_content"></result>
+			<result column="small_price" property="small_price"></result>
+		
+		<association javaType="LargeMenuDTO" property="largeMenuDTO">
+		<id column="large_menunum" property="large_menunum"/>
+			<result column="large_menunum" property="large_menunum"/>
+			<result column="rnum" property="rnum"></result>
+			<result column="large_name" property="large_name"></result>
+		</association>
+	</resultMap>	
+	
+  	
+  	<select id="getLarge_SmallMenu" parameterType="java.util.HashMap" resultMap="getLarge_SmallMenuMap">
+  		select * from yeps_largeMenu L, yeps_smallMenu S where L.large_menunum = S.large_menunum and L.rnum=#{rnum} order by S.small_menunum asc
+  	</select>
+  	
+  	<delete id="deleteLargeMenuByMemberNumber" parameterType="int">
+  		delete yeps_largeMenu where mnum = #{mnum}
+  	</delete>
+</mapper>

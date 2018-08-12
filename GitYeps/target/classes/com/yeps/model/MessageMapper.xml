@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper     
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"     
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yeps.model">
+
+	<select id="getContent" parameterType="int" resultType="MessageDTO">
+		select * from yeps_message where msgnum=#{msgnum}
+	</select>
+
+   <delete id="deleteMessage" parameterType="int">
+      delete from yeps_message where msgnum=#{msgnum}
+   </delete>
+
+   <insert id="writeMessage" parameterType="MessageDTO">
+      insert into yeps_message values(yeps_message_seq.nextval, #{mnum}, #{title}, #{receiver}, #{sender}, #{content}, sysdate, 0, 0, 0,#{isIssue},#{evnum},#{rvnum})
+   </insert>
+
+   <select id="messageList" resultType="MessageDTO" parameterType="MessageDTO">
+      ${sql}
+   </select>
+
+    <select id="getMessageCount" resultType="int">
+       select count(*) from yeps_message where isIssue=0
+   </select> 
+   
+   <select id="getSendCount" parameterType="java.util.HashMap" resultType="int">
+       select count(*) from yeps_message where sender=#{sender} and isIssue=0
+       </select> 
+       
+   <select id="getReceiveCount" parameterType="java.util.HashMap" resultType="int">
+       select count(*) from yeps_message where receiver=#{receiver} and isIssue=0 and islocker!=1
+   </select>  
+   
+   <select id="getLockerCount" resultType="int">
+       select count(*) from yeps_message where islocker=1 and isIssue=0 and receiver=#{receiver}
+   </select> 
+   
+   <select id="noneMessageCount" resultType="int">
+       select count(*) from yeps_message where islocker!=1 and readNum=0 and isIssue=0 and receiver=#{receiver}
+   </select>   
+   
+   <select id="readMessageCount" resultType="int">
+       select count(*) from yeps_message where islocker!=1 and readNum=1 and isIssue=0 and receiver=#{receiver}
+   </select>   
+   
+   <select id="noneLockerCount" resultType="int">
+       select count(*) from yeps_message where islocker=1 and readNum=0 and receiver=#{receiver}
+   </select>   
+   
+   <select id="readLockerCount" resultType="int">
+       select count(*) from yeps_message where islocker=1 and readNum=1 and receiver=#{receiver}
+   </select> 
+   
+   <select id="allAlertCount" parameterType="java.util.HashMap" resultType="int">
+       select count(*) from yeps_message where isIssue=1 and receiver=#{receiver}
+   </select> 
+   
+   <select id="readAlertCount" parameterType="java.util.HashMap" resultType="int">
+       select count(*) from yeps_message where isIssue=1 and readNum=1 and receiver=#{receiver}
+   </select> 
+   
+   <update id="updateReadDate" parameterType="int">
+       update yeps_message set readdate=sysdate where msgnum=#{msgnum}
+    </update>
+    
+    <update id="updateReadNum1" parameterType="int">
+        update yeps_message set readnum=1 where msgnum=#{msgnum}
+    </update>
+    
+     <update id="updateReadNum0" parameterType="int">
+        update yeps_message set readnum=0 where msgnum=#{msgnum}
+    </update>
+    
+    <update id="moveToLocker" parameterType="int">
+        update yeps_message set islocker=1 where msgnum=#{msgnum}
+    </update>
+    
+     <update id="lockerToMsgBox" parameterType="int">
+        update yeps_message set islocker=0 where msgnum=#{msgnum}
+    </update>
+    
+    <delete id="deleteMessageByMemberNumber" parameterType="int">
+    	delete yeps_message where mnum = #{mnum}
+    </delete>
+</mapper>
+
+
+
+
+
+
+
+
+
+

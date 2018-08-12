@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yeps.model">
+	<select id="listCategory" resultType="CategoryDTO">
+		select * from yeps_category
+	</select>
+
+	<insert id="insertCategory" parameterType="String">
+		insert into yeps_category values (yeps_category_seq.nextval, #{cname})
+	</insert>
+	
+	<delete id="deleteCategory" parameterType="int">
+		delete yeps_category where cnum = #{cnum}
+	</delete>
+	
+	<select id="getCategory" parameterType="int" resultType="CategoryDTO">
+		select * from yeps_category where cnum = #{cnum}
+	</select>
+	
+	<update id="editCategory" parameterType="java.util.HashMap">
+		update yeps_category set cname = #{cname} where cnum = #{cnum}
+	</update>
+</mapper>

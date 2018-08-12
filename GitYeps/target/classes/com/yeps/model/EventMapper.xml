@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yeps.model">
+
+	<select id="getEventCount" parameterType="String" resultType="int">
+		select count(*) from yeps_event where replace(upper(store_address),' ','') like '%'||replace(upper(#{search}),' ','')||'%'
+	</select>
+	
+	<select id="getEventCountForFree" parameterType="String" resultType="int">
+		select count(*) from yeps_event where discount like '%무료%' and replace(upper(store_address),' ','') like '%'||replace(upper(#{search}),' ','')||'%'
+	</select>
+	
+	<select id="getEventCountForCategory" parameterType="java.util.HashMap" resultType="int">
+		select count(*) from yeps_event where event_category = #{event_category} and replace(upper(store_address),' ','') like '%'||replace(upper(#{search}),' ','')||'%'
+	</select>
+	
+	<select id="eventCount" resultType="int">
+	    select count(*) from yeps_event 
+	    </select>
+	
+	<select id="listEvent" parameterType="java.util.HashMap" resultType="EventDTO">
+		${sql}
+	</select>
+	
+	<select id="manage_eventList" parameterType="java.util.HashMap" resultType="eventDTO">
+	     select * from (select rownum rn, A.* from (select * from yeps_event order by evnum desc)A) where rn between #{start} and #{end}
+		</select>
+	
+	<insert id="insertEvent" parameterType="EventDTO">
+		insert into yeps_event values (yeps_event_seq.nextval, #{eventname}, #{start_date},
+		 #{start_time}, #{end_date, jdbcType=VARCHAR}, #{end_time, jdbcType=VARCHAR}, #{store_address}, #{event_content}, #{discount}, #{event_category}, #{ip}, 
+		 #{filenum, jdbcType=INTEGER}, #{zipNo}, #{roadAddrPart1}, #{roadAddrPart2, jdbcType=VARCHAR}, #{addrDetail}, sysdate, #{mnum})
+	</insert>
+	
+	
+	<resultMap type="eventDTO" id="getEventContentMap">
+		<id column="evnum" property="evnum"/>
+		<result column="evnum" property="evnum"></result>
+		<result column="eventname" property="eventname"></result>
+		<result column="start_date" property="start_date"></result>
+		<result column="start_time" property="start_time"></result>
+		<result column="end_date" property="end_date"></result>
+		<result column="end_time" property="end_time"></result>
+		<result column="store_address" property="store_address"></result>
+		<result column="event_content" property="event_content"></result>
+		<result column="discount" property="discount"></result>
+		<result column="event_category" property="event_category"></result>
+		<result column="zipNo" property="zipNo"></result>
+		<result column="roadAddrPart1" property="roadAddrPart1"></result>
+		<result column="roadAddrPart2" property="roadAddrPart2"></result>
+		<result column="addrDetail" property="addrDetail"></result>
+		<result column="event_register_date" property="event_register_date"></result>
+				
+		<association javaType="FileDTO" property="fileDTO">
+			<id column="filenum" property="filenum"></id>
+			<result column="filename" property="filename"></result>			
+		</association>
+	</resultMap>
+	
+	<select id="getEventContent" parameterType="int" resultMap="getEventContentMap">
+		select  E.evnum
+				, E.eventname
+				, E.start_date
+				, E.start_time
+				, E.end_date
+				, E.end_time
+				, E.store_address
+				, E.event_content
+				, E.event_category
+				, E.discount
+				, E.zipNo
+				, E.roadAddrPart1
+				, E.roadAddrPart2
+				, E.addrDetail
+				, E.event_register_date				
+				, F.filename 
+		from yeps_event E, yeps_files F where E.evnum = F.evnum and F.ismainphoto = 'y' and E.evnum = #{evnum}
+	</select>
+	
+	<select id="getEventContentNoPhoto" parameterType="int" resultType="EventDTO">
+		select * from yeps_event where evnum = #{evnum}
+	</select>
+	
+	<select id="getEvnum" parameterType="java.util.HashMap" resultType="int">
+		select evnum from yeps_event where eventname = #{eventname} and store_address = #{store_address}
+	</select>
+	
+	<select id="RedundancyCheck" parameterType="String" resultType="EventDTO">
+		select * from yeps_event where eventname = #{eventname}
+	</select>
+	
+	<update id="updateFilenum" parameterType="java.util.HashMap">
+		update yeps_event set filenum = #{filenum} where evnum = #{evnum}
+	</update>
+	
+	
+	<resultMap type="eventDTO" id="getThisWeek_EventListMap">
+		<id column="evnum" property="evnum"/>
+		<result column="evnum" property="evnum"></result>
+		<result column="eventname" property="eventname"></result>
+		<result column="start_date" property="start_date"></result>
+		<result column="start_time" property="start_time"></result>
+		<result column="end_date" property="end_date"></result>
+		<result column="end_time" property="end_time"></result>
+		
+		<association javaType="FileDTO" property="fileDTO">
+			<id column="filenum" property="filenum"></id>
+			<result column="filename" property="filename"></result>			
+		</association>
+	</resultMap>
+	<select id="getThisWeek_EventList" resultMap="getThisWeek_EventListMap">
+		select  E.evnum
+				, E.eventname
+				, E.start_date
+				, E.start_time
+				, E.end_date
+				, E.end_time
+				, F.filename 
+		from 	yeps_event E, yeps_files F 
+		where 	E.evnum = F.evnum and F.ismainphoto = 'y' and (to_char(sysdate+7, 'yyyymmdd') >= E.end_date or to_char(sysdate-7, 'yyyymmdd') >= E.start_date) and rownum between 1 and 5
+		order 	by E.event_register_date asc
+ 	</select>
+ 	
+ 	<select id="getRandom_EventList" resultMap="getThisWeek_EventListMap">
+ 		select  E.evnum
+				, E.eventname
+				, E.start_date
+				, E.start_time
+				, E.end_date
+				, E.end_time
+				, F.filename 
+		from 	yeps_event E, yeps_files F 
+		where 	E.evnum = F.evnum and F.ismainphoto = 'y' and (to_char(sysdate+7, 'yyyymmdd') >= E.end_date or to_char(sysdate-7, 'yyyymmdd') >= E.start_date) and rownum between 1 and 3
+ 		order by dbms_random.value
+ 	</select>
+ 	
+ 	<delete id="deleteEvent" parameterType="int">
+ 		delete yeps_event where evnum = #{evnum}
+ 	</delete>
+ 	
+ 	<update id="updateEvent" parameterType="EventDTO">
+ 		update yeps_event set start_date = #{start_date}, start_time = #{start_time}, end_date = #{end_date, jdbcType=VARCHAR}, end_time = #{end_time, jdbcType=VARCHAR}, 
+ 				store_address = #{store_address}, event_content = #{event_content}, discount = #{discount}, event_category = #{event_category}, 
+ 				filenum = #{filenum, jdbcType=INTEGER}, zipNo = #{zipNo}, roadAddrPart1 = #{roadAddrPart1}, roadAddrPart2 = #{roadAddrPart2, jdbcType=VARCHAR}, 
+ 				addrDetail = #{addrDetail} where eventname = #{eventname}
+ 	</update>
+ 	
+ 	<delete id="deleteEventByMemberNumber" parameterType="int">
+ 		delete yeps_event where mnum = #{mnum}
+ 	</delete>
+</mapper>

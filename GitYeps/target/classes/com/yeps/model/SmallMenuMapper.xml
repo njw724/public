@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yeps.model">
+	
+	<insert id="insertSmallMenu" parameterType="SmallMenuDTO">
+		insert into yeps_smallMenu values(yeps_smallMenu_seq.nextval,#{large_menunum},#{small_name},#{small_content},#{small_price})
+	</insert>
+	<select id="listSmallMenu" resultType="SmallMenuDTO">
+		select * from yeps_smallMenu where large_menunum=#{large_menunum} order by small_menunum asc
+	</select>
+	
+	<delete id="deleteSmallMenuByMemberNumber" parameterType="int">
+		delete yeps_smallMenu where mnum = #{mnum}
+	</delete>
+</mapper>

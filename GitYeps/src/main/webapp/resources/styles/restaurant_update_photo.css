@@ -1,0 +1,322 @@
+#insert_photo_main {
+	float: left;
+    padding: 0 15px;
+    min-height: 1px;
+    box-sizing: border-box;
+    width: 100%;
+}
+ 
+#user_photo_intro > h2 {
+	word-wrap: break-word !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 21px;
+    line-height: 1.28571em;
+    color: #d32323;
+    margin: 0 0 6px;
+}
+
+#restaurant_photo_drop_container {
+	display: block;
+}
+
+#restaurant_photo_drop_container #file_drop_area {
+	width: 90%;
+	margin: 24px auto;
+	padding: 100px 0;
+	display: table;
+	box-sizing: border-box;
+    border: 3px dashed #999;
+    border-radius: 8px;
+    text-align: center;
+    pointer-events: none;
+}
+
+#file_upload_help_container {
+	margin-left: -15px;
+    margin-right: -15px;
+    padding: 48px 0;
+    display: flex;
+    border-collapse: separate;
+    border-spacing: 30px 0;
+    min-width: 100%;
+    table-layout: auto;
+}
+
+#file_upload_help_container #file_upload_help_units {
+	-webkit-box-flex: 1;
+	flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: block;
+    margin-left: 15px;
+    margin-right: 15px;
+    border-collapse: collapse;
+    border-spacing: 0 0;
+    box-sizing: border-box;
+    vertical-align: top;
+    text-align: center;
+}
+
+#file_upload_help_container #file_upload_help_units img {
+	vertical-align: middle;
+	margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+}
+
+#file_upload_help_text {
+	margin: 12px 24px;
+	color: #999;
+    font-weight: normal;
+}
+
+#insert_photo_super_wrap a:hover {
+	text-decoration: underline;
+}
+
+#finish_upload_header {
+	margin-top: 12px;
+    margin-bottom: 24px;
+	display: table;
+    min-width: 100%;
+    table-layout: auto;
+}
+
+#upload_title_wrap {
+	vertical-align: middle;
+	box-sizing: border-box;
+    display: table-cell;
+}
+
+#upload_title_success {
+	margin-bottom: 9px;
+}
+
+#upload_title_text {
+	color: #333;
+	display: inline-block;
+	word-wrap: break-word !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 16px;
+    line-height: 1.3125em;
+    margin: 0 0 6px;
+}
+
+#finish_button_wrap {
+	vertical-align: middle;
+	margin-left: -18px;
+    margin-right: -18px;
+    border-collapse: separate;
+    border-spacing: 18px 0;
+    box-sizing: border-box;
+    display: table-cell;
+    min-width: 100%;
+    table-layout: auto;
+}
+
+#finish_button_container {
+	margin-left: 9px;
+    margin-right: 9px;
+    border-collapse: collapse;
+    border-spacing: 0 0;
+    vertical-align: middle;
+    box-sizing: border-box;
+    display: table-cell;
+}
+
+#finish_button {
+	color: white;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.3);
+    background-color: #d90007;
+    background: linear-gradient(#d90007, #c91400);
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    cursor: pointer;
+    border: 1px solid #8d0005;
+    font-weight: bold;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.28571em;
+    padding: 8px 19px 9px;
+    border-radius: 3px;
+    overflow: visible;
+}
+
+#finish_button:hover {
+	background: red;
+}
+
+#photo_box_grid_wide {
+	margin-right: -18px;
+	display: block;
+    font-size: 0;
+    line-height: 1;
+    text-align: left;
+}
+
+#photo_box_grid_wide > #uploaded_photo {
+	margin: 0 18px 18px 0;
+    width: 226px;
+    float: none;
+    display: inline-block;
+    zoom: 1;
+    vertical-align: top;
+    font-size: 14px;
+    line-height: 1.28571em;
+}
+
+#photo_box_grid_wide > #uploaded_photo > #photo_box {
+	height: 226px;
+	margin-bottom: 12px;
+	position: relative;
+}
+
+#photo_box > #photo_box_img {
+	border-radius: 4px;
+	width: 226px;
+    height: 226px;
+    object-fit: cover;
+    vertical-align: middle;
+}
+
+#photo_box_delete {
+	z-index: 1010;
+	left: auto;
+	position: absolute;
+    top: 6px;
+    right: 6px;
+}
+
+#photo_box_action_link {
+	display: inline-block;
+    vertical-align: middle;
+    padding: 2px 4px;
+    border-radius: 3px;
+    background: rgba(0,0,0,0.3);
+    font-size: 12px;
+    line-height: 1.7;
+    color: #f5f5f5;
+    cursor: pointer;
+    position: relative;
+}
+
+#photo_box_action_link:hover {
+	background: rgba(0,0,0,0.8);
+    text-decoration: none;
+    color: #fff;
+}
+
+#photo_box_action_link:hover #tooltip_wrapper {
+	left: 16px;
+}
+
+#tooltip_wrapper {
+	position: absolute;
+    left: -9999px;
+    bottom: 100%;
+    width: 250px;
+    margin-left: -125px;
+    margin-bottom: 5px;
+    text-align: center;
+    text-decoration: none;
+    overflow: visible !important;
+}
+
+#tooltip {
+	overflow: visible !important;
+	z-index: 9000;
+	display: inline-block;
+    position: relative;
+    padding: 6px 9px;
+    vertical-align: middle;
+    white-space: normal;
+    font-size: 12px;
+    pointer-events: none;
+    font-weight: bold;
+    line-height: 18px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    border-radius: 5px;
+    text-shadow: none;
+    text-align: left;
+    cursor: default;
+    box-shadow: 0 1px rgba(255,255,255,0.1);
+}
+
+#tooltip:before {
+	display: block;
+    position: absolute;
+    content: " ";
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+    margin: auto;
+    z-index: 5;
+    left: 50%;
+    top: 100%;
+    right: auto;
+    bottom: auto;
+    margin-left: -8px;
+    border-top-color: rgba(255,255,255,0.1);
+}
+
+#tooltip:after {
+	display: block;
+    position: absolute;
+    content: " ";
+    width: 0;
+    height: 0;
+    border: 7px solid transparent;
+    margin: auto;
+    z-index: 5;
+    left: 50%;
+    top: 100%;
+    right: auto;
+    bottom: auto;
+    margin-left: -7px;
+    border-top-color: rgba(0,0,0,0.8);
+}
+
+.photo-box-overlay {
+    position: absolute;
+    right: 0;
+    left: 0;
+    padding: 3px 6px;
+    border-radius: 4px 4px 0 0;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    font-size: 12px;
+    line-height: 1.5em;
+    font-weight: bold;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

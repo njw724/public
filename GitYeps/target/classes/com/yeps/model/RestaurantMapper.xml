@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.web.model">
+        
+    <delete id="deleteRestaurant" parameterType="int">
+         delete from yeps_restaurant where rnum=#{rnum}
+     </delete>
+        
+	
+	 <select id="getSearchRestaurantCount" parameterType="java.util.HashMap" resultType="int">
+      select count(*) from yeps_restaurant where ${search} like '%'||#{searchString}||'%'
+   </select>
+   
+    <resultMap type="RestaurantDTO" id="findRestaurant_Manage_Map">
+			<id column="rnum" property="rnum"/>
+			<result column="mnum" property="mnum"></result>
+			<result column="rname" property="rname"></result>
+			<result column="foodstyle" property="foodstyle"></result>
+			<result column="rest_regdate" property="rest_regdate"></result>
+	
+	        <association javaType="MemberDTO" property="memberDTO">
+				<id column="mnum" property="mnum"></id>
+				<result column="name" property="name"></result>
+			</association>
+		</resultMap>
+   
+   <select id="findRestaurant_Manage" parameterType="java.util.HashMap" resultMap="findRestaurant_Manage_Map">
+      select * from (select rownum rn, A.* from(select 
+                     RT.mnum
+        		, RT.rname
+        		, RT.foodstyle
+        		, RT.rest_regdate
+        		, M.name
+       from yeps_restaurant RT, yeps_member M where RT.mnum = M.mnum and RT.rname= rname and M.name=name and replace(upper(#{search}),' ','') like '%'||replace(upper(#{searchString}),' ','')||'%' order by rnum desc)A) 
+       where rn between #{startRow} and #{endRow}
+   </select>
+   
+	<resultMap type="restaurantDTO" id="listRestaurantMap">
+     	<id column="rnum" property="rnum"/>
+     	<result column="rnum" property="rnum"></result>
+     	<result column="rname" property="rname"></result>
+     	<result column="price" property="price"></result>
+     	<result column="foodstyle" property="foodstyle"></result>
+     	<result column="roadAddrPart1" property="roadAddrPart1"></result>
+     	<result column="addrDetail" property="addrDetail"></result>
+     	<result column="roadAddrPart2" property="roadAddrPart2"></result>
+     	<result column="raddress" property="raddress"></result>
+     	<result column="hp2" property="hp2"></result>
+     	<result column="hp3" property="hp3"></result>
+     	<result column="reststyle" property="reststyle"></result>
+     	<result column="category" property="category"></result>
+     	<result column="price" property="price"></result>
+     	<association javaType="FileDTO" property="fileDTO">
+     		<id column="filenum" property="filenum"></id>
+     		<result column="filename" property="filename"></result>
+     	</association>
+     </resultMap> 
+	<select id="listRestaurant" parameterType="java.util.HashMap" resultMap="listRestaurantMap" >
+		select * from (select rownum rn, A.* from (select 
+													RT.rnum, RT.rname, RT.price, RT.foodstyle, RT.roadAddrPart1, RT.addrDetail, RT.roadAddrPart2,
+													RT.raddress, RT.hp2, RT.hp3, RT.reststyle, RT.category, F.filename
+		from yeps_restaurant RT, yeps_files F where 
+		RT.rnum = F.rnum and F.ismainphoto = 'y' and replace(upper(RT.roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%' 
+		<if test='sql !=null '>AND (RT.price=#{sql} <if test="pricesSql != null">
+		<foreach collection="pricesSql" item="item" index="index">
+            OR RT.price=#{item.value}
+        </foreach>
+		</if>)</if>
+		order by RT.price desc)A) where rn between #{start} and #{end}
+	</select>
+
+	<insert id="insertRestaurant" parameterType="RestaurantDTO">
+		insert into yeps_restaurant values(yeps_restaurant_seq.nextval,0,#{rname},#{rest_filename, jdbcType=VARCHAR},#{zipNo},#{roadAddrPart1},#{addrDetail},#{roadAddrPart2},
+		#{raddress},#{hp2},#{hp3},#{foodstyle},#{mon, jdbcType=VARCHAR},#{tue, jdbcType=VARCHAR},#{wed, jdbcType=VARCHAR},#{thu, jdbcType=VARCHAR},
+		#{fri, jdbcType=VARCHAR},#{sat, jdbcType=VARCHAR},#{sun,jdbcType=VARCHAR},
+		#{reststyle},#{reserv},#{delivery},#{takeout},#{parking},#{kidszone},#{groupreserv},#{noise},#{alcohol, jdbcType=VARCHAR},#{waiting},
+		#{wifi},#{toilet},#{tablecount},#{standard},#{busytime, jdbcType=VARCHAR},sysdate,#{mnum,jdbcType=INTEGER},#{category, jdbcType=VARCHAR},#{price, jdbcType=INTEGER})
+	</insert>
+	
+	
+	<resultMap type="restaurantDTO" id="getRestMap">
+     	<id column="rnum" property="rnum"/>
+     	<result column="rnum" property="rnum"></result>
+     	<result column="rname" property="rname"></result>
+     	<result column="zipNo" property="zipNo"></result>
+     	<result column="price" property="price"></result>
+     	<result column="foodstyle" property="foodstyle"></result>
+     	<result column="roadAddrPart1" property="roadAddrPart1"></result>
+     	<result column="addrDetail" property="addrDetail"></result>
+     	<result column="roadAddrPart2" property="roadAddrPart2"></result>
+     	<result column="raddress" property="raddress"></result>
+     	<result column="hp2" property="hp2"></result>
+     	<result column="hp3" property="hp3"></result>
+     	<result column="foodstyle" property="foodstyle"></result>
+     	<result column="mon" property="mon"></result>
+     	<result column="tue" property="tue"></result>
+     	<result column="wed" property="wed"></result>
+     	<result column="thu" property="thu"></result>
+     	<result column="fri" property="fri"></result>
+     	<result column="sat" property="sat"></result>
+     	<result column="sun" property="sun"></result>
+     	<result column="reststyle" property="reststyle"></result>
+     	<result column="reserv" property="reserv"></result>
+     	<result column="delivery" property="delivery"></result>
+     	<result column="takeout" property="takeout"></result>
+     	<result column="parking" property="parking"></result>
+     	<result column="kidszone" property="kidszone"></result>
+     	<result column="groupreserv" property="groupreserv"></result>
+     	<result column="noise" property="noise"></result>
+     	<result column="alcohol" property="alcohol"></result>
+     	<result column="waiting" property="waiting"></result>
+     	<result column="wifi" property="wifi"></result>
+     	<result column="toilet" property="toilet"></result>
+     	<result column="tablecount" property="tablecount"></result>
+     	<result column="standard" property="standard"></result>
+     	<result column="busytime" property="busytime"></result>
+     	<result column="category" property="category"></result>
+     	<result column="price" property="price"></result>
+     	<result column="rest_regdate" property="rest_regdate"></result>
+     	<association javaType="FileDTO" property="fileDTO">
+     		<id column="filenum" property="filenum"></id>
+     		<result column="filename" property="filename"></result>
+     	</association>
+     </resultMap> 
+	
+	<select id="getRest" parameterType="int" resultMap="getRestMap">
+		select * from yeps_restaurant RT, yeps_files F where RT.rnum = F.rnum and F.ismainphoto = 'y' and RT.rnum = #{rnum}
+	</select>
+	
+	<select id="getCount" resultType="int">
+		select count(*) from yeps_restaurant
+	</select>
+	
+	<select id="getCountBySeoul" resultType="int">
+		select count(*) from yeps_restaurant where replace(upper(roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%'
+	</select>
+	
+	<select id="getImageCount" resultType="int">
+		select count(*) from yeps_files where rnum=#{rnum}
+	</select>
+	
+	<select id="review_write_getrname" parameterType="int" resultType="String"> 
+		select rname from yeps_restaurant where rnum= #{rnum} 
+	</select>
+	
+	<resultMap type="restaurantDTO" id="listRestaurant_deliveryMap">
+     	<id column="rnum" property="rnum"/>
+     	<result column="rnum" property="rnum"></result>
+     	<result column="rname" property="rname"></result>
+     	<result column="price" property="price"></result>
+     	<result column="roadAddrPart1" property="roadAddrPart1"></result>
+     	<result column="addrDetail" property="addrDetail"></result>
+     	<result column="roadAddrPart2" property="roadAddrPart2"></result>
+     	<result column="raddress" property="raddress"></result>
+     	<result column="hp2" property="hp2"></result>
+     	<result column="hp3" property="hp3"></result>
+     	<result column="foodstyle" property="foodstyle"></result>
+     	<result column="reststyle" property="reststyle"></result>
+     	<result column="category" property="category"></result>
+     	<association javaType="FileDTO" property="fileDTO">
+     		<id column="filenum" property="filenum"></id>
+     		<result column="filename" property="filename"></result>
+     	</association>
+     </resultMap> 
+	<select id="listRestaurant_delivery" parameterType="java.util.HashMap" resultMap="listRestaurant_deliveryMap" > 
+		select * from (SELECT
+    ROWNUM rn,
+    a.*
+FROM
+    (
+        SELECT
+            RT.rnum,
+            RT.rname,
+            RT.price,
+            RT.roadAddrPart1,
+            RT.addrDetail,
+            RT.roadAddrPart2,
+            RT.raddress,
+            RT.hp2,
+            RT.hp3,
+            RT.foodstyle,
+            RT.reststyle,
+            RT.category,
+            F.filenum,
+            F.filename
+        FROM
+            yeps_restaurant RT,
+            yeps_files F
+        WHERE
+            RT.rnum = F.rnum
+            AND   F.ismainphoto = 'y'
+            AND   RT.delivery = '가능'
+            and replace(upper(RT.roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%'
+        ORDER BY
+            rt.rnum DESC
+    ) a) where rn between #{start} and #{end} 
+	</select>
+	
+	
+	
+	<resultMap type="restaurantDTO" id="listRestaurant_reservMap">
+     	<id column="rnum" property="rnum"/>
+     	<result column="rnum" property="rnum"></result>
+     	<result column="rname" property="rname"></result>
+     	<result column="price" property="price"></result>
+     	<result column="roadAddrPart1" property="roadAddrPart1"></result>
+     	<result column="addrDetail" property="addrDetail"></result>
+     	<result column="roadAddrPart2" property="roadAddrPart2"></result>
+     	<result column="raddress" property="raddress"></result>
+     	<result column="hp2" property="hp2"></result>
+     	<result column="hp3" property="hp3"></result>
+     	<result column="foodstyle" property="foodstyle"></result>
+     	<result column="reststyle" property="reststyle"></result>
+     	<result column="category" property="category"></result>
+     	<association javaType="FileDTO" property="fileDTO">
+     		<id column="filenum" property="filenum"></id>
+     		<result column="filename" property="filename"></result>
+     	</association>
+     </resultMap> 
+	<select id="listRestaurant_reserv" parameterType="java.util.HashMap" resultMap="listRestaurant_reservMap" > 
+				select * from (SELECT
+    ROWNUM rn,
+    a.*
+FROM
+    (
+        SELECT
+            RT.rnum,
+            RT.rname,
+            RT.price,
+            RT.roadAddrPart1,
+            RT.addrDetail,
+            RT.roadAddrPart2,
+            RT.raddress,
+            RT.hp2,
+            RT.hp3,
+            RT.foodstyle,
+            RT.reststyle,
+            RT.category,
+            F.filenum,
+            F.filename
+        FROM
+            yeps_restaurant RT,
+            yeps_files F
+        WHERE
+            RT.rnum = F.rnum
+            AND   F.ismainphoto = 'y'
+            AND   RT.reserv = '가능'
+            and replace(upper(RT.roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%'
+        ORDER BY
+            rt.rnum DESC
+    ) a) where rn between #{start} and #{end}  
+	</select>
+
+
+	<resultMap type="restaurantDTO" id="listRestaurant_takeoutMap">
+     	<id column="rnum" property="rnum"/>
+     	<result column="rnum" property="rnum"></result>
+     	<result column="rname" property="rname"></result>
+     	<result column="price" property="price"></result>
+     	<result column="foodstyle" property="foodstyle"></result>
+     	<result column="roadAddrPart1" property="roadAddrPart1"></result>
+     	<result column="addrDetail" property="addrDetail"></result>
+     	<result column="roadAddrPart2" property="roadAddrPart2"></result>
+     	<result column="raddress" property="raddress"></result>
+     	<result column="hp2" property="hp2"></result>
+     	<result column="hp3" property="hp3"></result>
+     	<result column="category" property="category"></result>
+     	<association javaType="FileDTO" property="fileDTO">
+     		<id column="filenum" property="filenum"></id>
+     		<result column="filename" property="filename"></result>
+     	</association>
+     </resultMap> 
+	<select id="listRestaurant_takeout" parameterType="java.util.HashMap" resultMap="listRestaurant_takeoutMap" > 
+						select * from (SELECT
+    ROWNUM rn,
+    a.*
+FROM
+    (
+        SELECT
+            RT.rnum,
+            RT.rname,
+            RT.price,
+            RT.roadAddrPart1,
+            RT.addrDetail,
+            RT.roadAddrPart2,
+            RT.raddress,
+            RT.hp2,
+            RT.hp3,
+            RT.foodstyle,
+            RT.reststyle,
+            RT.category,
+            F.filenum,
+            F.filename
+        FROM
+            yeps_restaurant RT,
+            yeps_files F
+        WHERE
+            RT.rnum = F.rnum
+            AND   F.ismainphoto = 'y'
+            AND   RT.takeout = '가능'
+            and replace(upper(RT.roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%'
+        ORDER BY
+            rt.rnum DESC
+    ) a) where rn between #{start} and #{end}   
+	</select>
+	
+	
+
+	<select id="getNewRestaurant" resultType="RestaurantDTO" > 
+		select * from yeps_restaurant where rownum=1 order by rnum desc 
+	</select>
+	
+	
+	<!-- =========================================================== -->
+	
+	<select id="GetRestaurantName_R" parameterType="int" resultType="RestaurantDTO">
+		select * from yeps_restaurant where rnum = #{GETrnum}
+	</select>
+	
+	
+	<resultMap type="restaurantDTO" id="review_restaurantIMGMap">
+     	<id column="rnum" property="rnum"/>
+     	<result column="rnum" property="rnum"></result>
+     	<result column="rname" property="rname"></result>
+     	<result column="price" property="price"></result>
+     	<result column="foodstyle" property="foodstyle"></result>
+     	<result column="roadAddrPart1" property="roadAddrPart1"></result>
+     	<result column="rest_regdate" property="rest_regdate"></result>
+     	
+     	<association javaType="FileDTO" property="fileDTO">
+     		<id column="filenum" property="filenum"></id>
+     		<result column="filename" property="filename"></result>
+     	</association>
+     </resultMap>
+	<select id="review_restaurantIMG" resultMap="review_restaurantIMGMap">
+        select * from yeps_restaurant RT, yeps_files F where 19 >= rownum and RT.rnum = F.rnum and F.ismainphoto = 'y' 
+    </select>
+     
+     <!-- 12월 31일 지원 추가 -->
+     <resultMap type="restaurantDTO" id="HotAndNewRestaurantMap">
+     	<id column="rnum" property="rnum"/>
+     	<result column="rnum" property="rnum"></result>
+     	<result column="rname" property="rname"></result>
+     	<result column="price" property="price"></result>
+     	<result column="foodstyle" property="foodstyle"></result>
+     	<result column="roadAddrPart1" property="roadAddrPart1"></result>
+     	<result column="rest_regdate" property="rest_regdate"></result>
+     	
+     	<association javaType="FileDTO" property="fileDTO">
+     		<id column="filenum" property="filenum"></id>
+     		<result column="filename" property="filename"></result>
+     	</association>
+     </resultMap>     
+     
+	<select id="getHotAndNewRestaurant" parameterType="int" resultMap="HotAndNewRestaurantMap">
+		select		RT.rnum
+					, RT.rname
+					, RT.price
+					, RT.foodstyle
+					, RT.roadAddrPart1
+					, RT.rest_regdate
+					, F.filename
+		from yeps_restaurant RT, yeps_files F 
+		where RT.rnum = F.rnum and F.ismainphoto = 'y' and RT.rnum = #{rnum}
+	</select>
+	
+	<select id="getHotAndNewRestaurant_noPhoto" parameterType="int" resultType="RestaurantDTO">
+		select * from yeps_restaurant where rnum=#{rnum}
+	</select>
+	
+	<!-- 이벤트랑 연결 -->
+	<select id="findRestaurant" parameterType="java.util.HashMap" resultType="RestaurantDTO">
+		select * from yeps_restaurant where zipNo = #{zipNo} and roadAddrPart1 = #{roadAddrPart1} and roadAddrPart2 = #{roadAddrPart2} and addrDetail = #{addrDetail}
+	</select>
+	
+	<!-- 1월 4일 상우 추가 -->
+	
+	<select id="get_review_restaurantFind_Count" parameterType="java.util.HashMap" resultType="int">
+ 		select count(*) from yeps_restaurant
+ 	</select>
+ 	
+ 	
+ 	<select id="get_review_restaurantFind_CountByNear" parameterType="java.util.HashMap" resultType="int">
+ 		select count(*) from yeps_restaurant where replace(upper(roadAddrPart1),' ','') like '%'||replace(upper(#{SearchNear}),' ','')||'%'
+ 	</select>
+ 	<select id="get_review_restaurantFind_CountByFind" parameterType="java.util.HashMap" resultType="int">
+ 		select count(*) from yeps_restaurant where replace(upper(rname),' ','') like '%'||replace(upper(#{SearchFind}),' ','')||'%'
+ 	</select>
+ 	<select id="get_review_restaurantFind_CountByAll" parameterType="java.util.HashMap" resultType="int">
+ 		select count(*) from yeps_restaurant where replace(upper(roadAddrPart1),' ','') like '%'||replace(upper(#{SearchNear}),' ','')||'%' and replace(upper(rname),' ','') like '%'||replace(upper(#{SearchFind}),' ','')||'%'
+ 	</select>
+ 	
+ 	
+ 	<resultMap type="restaurantDTO" id="review_restaurantFindMap">
+     	<id column="rnum" property="rnum"/>
+     	<result column="rnum" property="rnum"></result>
+     	<result column="rname" property="rname"></result>
+     	<result column="price" property="price"></result>
+     	<result column="roadAddrPart1" property="roadAddrPart1"></result>
+     	<result column="addrDetail" property="addrDetail"></result>
+     	<result column="roadAddrPart2" property="roadAddrPart2"></result>
+     	<result column="raddress" property="raddress"></result>
+     	<result column="hp2" property="hp2"></result>
+     	<result column="hp3" property="hp3"></result>
+     	<result column="foodstyle" property="foodstyle"></result>
+     	<result column="reststyle" property="reststyle"></result>
+     	<result column="category" property="category"></result>
+     	<association javaType="FileDTO" property="fileDTO">
+     		<id column="filenum" property="filenum"></id>
+     		<result column="filename" property="filename"></result>
+     	</association>
+     </resultMap> 
+
+ 	<select id="review_restaurantFind" parameterType="java.util.HashMap" resultMap="review_restaurantFindMap">
+ 		select * from (select rownum rn,A.* from(select RT.rnum,
+            											RT.rname,
+            											RT.price,
+            											RT.roadAddrPart1,
+            											RT.addrDetail,
+            											RT.roadAddrPart2,
+            											RT.raddress,
+            											RT.hp2,
+            											RT.hp3,
+            											RT.foodstyle,
+            											RT.reststyle,
+            											RT.category,
+            											F.filenum,
+            											F.filename
+ 				from yeps_restaurant RT, yeps_files F where RT.rnum = F.rnum and F.ismainphoto = 'y' order by RT.rnum desc)A) where rn between #{start} and #{end} 
+ 	</select>
+ 	<select id="review_restaurantFindByNear" parameterType="java.util.HashMap" resultMap="review_restaurantFindMap">
+ 		select *from (select rownum rn,A.* from(select RT.rnum,
+            											RT.rname,
+            											RT.price,
+            											RT.roadAddrPart1,
+            											RT.addrDetail,
+            											RT.roadAddrPart2,
+            											RT.raddress,
+            											RT.hp2,
+            											RT.hp3,
+            											RT.foodstyle,
+            											RT.reststyle,
+            											RT.category,
+            											F.filenum,
+            											F.filename
+				from yeps_restaurant RT, yeps_files F where RT.rnum = F.rnum and F.ismainphoto = 'y' and replace(upper(roadAddrPart1),' ','') like '%'||replace(upper(#{SearchNear}),' ','')||'%' order by rnum desc)A) where rn between #{start} and #{end} 
+ 	</select>
+ 	<select id="review_restaurantFindByFind" parameterType="java.util.HashMap" resultMap="review_restaurantFindMap">
+ 		select *from (select rownum rn,A.* from(select RT.rnum,
+            											RT.rname,
+            											RT.price,
+            											RT.roadAddrPart1,
+            											RT.addrDetail,
+            											RT.roadAddrPart2,
+            											RT.raddress,
+            											RT.hp2,
+            											RT.hp3,
+            											RT.foodstyle,
+            											RT.reststyle,
+            											RT.category,
+            											F.filenum,
+            											F.filename
+ 			from yeps_restaurant RT, yeps_files F where RT.rnum = F.rnum and F.ismainphoto = 'y' and replace(upper(rname),' ','') like '%'||replace(upper(#{SearchFind}),' ','')||'%' order by rnum desc)A) where rn between #{start} and #{end} 
+ 	</select>
+ 	<select id="review_restaurantFindByAll" parameterType="java.util.HashMap" resultMap="review_restaurantFindMap">
+ 		select * from (select rownum rn,A.* from(select RT.rnum,
+            											RT.rname,
+            											RT.price,
+            											RT.roadAddrPart1,
+            											RT.addrDetail,
+            											RT.roadAddrPart2,
+            											RT.raddress,
+            											RT.hp2,
+            											RT.hp3,
+            											RT.foodstyle,
+            											RT.reststyle,
+            											RT.category,
+            											F.filenum,
+            											F.filename
+ 			from yeps_restaurant RT, yeps_files F where RT.rnum = F.rnum and F.ismainphoto = 'y' and replace(upper(roadAddrPart1),' ','') like '%'||replace(upper(#{SearchNear}),' ','')||'%' and replace(upper(rname),' ','') like '%'||replace(upper(#{SearchFind}),' ','')||'%' order by rnum desc)A) where rn between #{start} and #{end} 
+ 	</select>
+	
+	
+	<!-- 1월 5일 민우 추가 -->
+	<select id="getCountByCLS" parameterType="java.util.HashMap" resultType="int">
+		select count(*) from yeps_restaurant where category=#{category} and replace(upper(roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%' and replace(upper(rname),' ','') like '%'||replace(upper(#{searchword}),' ','')||'%'
+	</select>
+	<select id="getCountByCL" parameterType="java.util.HashMap" resultType="int">
+		select count(*) from yeps_restaurant where category=#{category} and replace(upper(roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%'
+	</select>
+	<select id="getCountByCS" parameterType="java.util.HashMap" resultType="int">
+		select count(*) from yeps_restaurant where category=#{category} and replace(upper(rname),' ','') like '%'||replace(upper(#{searchword}),' ','')||'%'
+	</select>
+	<select id="getCountByC" parameterType="java.util.HashMap" resultType="int">
+		select count(*) from yeps_restaurant where category=#{category}
+	</select>
+	<select id="getCountByLS" parameterType="java.util.HashMap" resultType="int">
+		select count(*) from yeps_restaurant where replace(upper(roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%' and replace(upper(rname),' ','') like '%'||replace(upper(#{searchword}),' ','')||'%'
+	</select>
+	<select id="getCountByL" parameterType="java.util.HashMap" resultType="int">
+		select count(*) from yeps_restaurant where replace(upper(roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%'
+	</select>
+	<select id="getCountByS" parameterType="java.util.HashMap" resultType="int">
+		select count(*) from yeps_restaurant where replace(upper(rname),' ','') like '%'||replace(upper(#{searchword}),' ','')||'%'
+	</select>
+	
+	<select id="listRestByCLS" parameterType="java.util.HashMap" resultMap="listRestaurantMap" > 
+		select * from (select rownum rn, A.* from (select 
+													RT.rnum, RT.rname, RT.price, RT.foodstyle, RT.roadAddrPart1, RT.addrDetail, RT.roadAddrPart2,
+													RT.raddress, RT.hp2, RT.hp3, RT.reststyle, RT.category, F.filename
+		from yeps_restaurant RT, yeps_files F where 
+		RT.rnum = F.rnum and F.ismainphoto = 'y' and RT.category=#{category} and replace(upper(RT.roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%' and replace(upper(RT.rname),' ','') like '%'||replace(upper(#{searchword}),' ','')||'%' order by RT.rnum desc)A) where rn between #{start} and #{end} 
+	</select>
+	<select id="listRestByCL" parameterType="java.util.HashMap" resultMap="listRestaurantMap" > 
+		select * from (select rownum rn, A.* from (select 
+													RT.rnum, RT.rname, RT.price, RT.foodstyle, RT.roadAddrPart1, RT.addrDetail, RT.roadAddrPart2,
+													RT.raddress, RT.hp2, RT.hp3, RT.reststyle, RT.category, F.filename
+		from yeps_restaurant RT, yeps_files F where 
+		RT.rnum = F.rnum and F.ismainphoto = 'y' and RT.category=#{category} and replace(upper(RT.roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%' order by RT.rnum desc)A) where rn between #{start} and #{end} 
+	</select>
+	<select id="listRestByCS" parameterType="java.util.HashMap" resultMap="listRestaurantMap" > 
+		select * from (select rownum rn, A.* from (select 
+													RT.rnum, RT.rname, RT.price, RT.foodstyle, RT.roadAddrPart1, RT.addrDetail, RT.roadAddrPart2,
+													RT.raddress, RT.hp2, RT.hp3, RT.reststyle, RT.category, F.filename
+		from yeps_restaurant RT, yeps_files F where 
+		RT.rnum = F.rnum and F.ismainphoto = 'y' and RT.category=#{category} and replace(upper(RT.rname),' ','') like '%'||replace(upper(#{searchword}),' ','')||'%' order by RT.rnum desc)A) where rn between #{start} and #{end} 
+	</select>
+	<select id="listRestByC" parameterType="java.util.HashMap" resultMap="listRestaurantMap" > 
+		select * from (select rownum rn, A.* from (select 
+													RT.rnum, RT.rname, RT.price, RT.foodstyle, RT.roadAddrPart1, RT.addrDetail, RT.roadAddrPart2,
+													RT.raddress, RT.hp2, RT.hp3, RT.reststyle, RT.category, F.filename
+		from yeps_restaurant RT, yeps_files F where 
+		RT.rnum = F.rnum and F.ismainphoto = 'y' and RT.category=#{category} order by RT.rnum desc)A) where rn between #{start} and #{end} 
+	</select>
+	<select id="listRestByLS" parameterType="java.util.HashMap" resultMap="listRestaurantMap" > 
+		select * from (select rownum rn, A.* from (select 
+													RT.rnum, RT.rname, RT.price, RT.foodstyle, RT.roadAddrPart1, RT.addrDetail, RT.roadAddrPart2,
+													RT.raddress, RT.hp2, RT.hp3, RT.reststyle, RT.category, F.filename
+		from yeps_restaurant RT, yeps_files F where 
+		RT.rnum = F.rnum and F.ismainphoto = 'y' and replace(upper(RT.roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%' and replace(upper(RT.rname),' ','') like '%'||replace(upper(#{searchword}),' ','')||'%' order by RT.rnum desc)A) where rn between #{start} and #{end} 
+	</select>
+	<select id="listRestByL" parameterType="java.util.HashMap" resultMap="listRestaurantMap" > 
+		select * from (select rownum rn, A.* from (select 
+													RT.rnum, RT.rname, RT.price, RT.foodstyle, RT.roadAddrPart1, RT.addrDetail, RT.roadAddrPart2,
+													RT.raddress, RT.hp2, RT.hp3, RT.reststyle, RT.category, F.filename
+		from yeps_restaurant RT, yeps_files F where 
+		RT.rnum = F.rnum and F.ismainphoto = 'y' and replace(upper(RT.roadAddrPart1),' ','') like '%'||replace(upper(#{location}),' ','')||'%' order by RT.rnum desc)A) where rn between #{start} and #{end} 
+	</select>
+	<select id="listRestByS" parameterType="java.util.HashMap" resultMap="listRestaurantMap" > 
+		select * from (select rownum rn, A.* from (select 
+													RT.rnum, RT.rname, RT.price, RT.foodstyle, RT.roadAddrPart1, RT.addrDetail, RT.roadAddrPart2,
+													RT.raddress, RT.hp2, RT.hp3, RT.reststyle, RT.category, F.filename
+		from yeps_restaurant RT, yeps_files F where 
+		RT.rnum = F.rnum and F.ismainphoto = 'y' and replace(upper(RT.rname),' ','') like '%'||replace(upper(#{searchword}),' ','')||'%' order by RT.rnum desc)A) where rn between #{start} and #{end} 
+	</select>
+	
+	<delete id="deleteRestaurantByMemberNumber" parameterType="int">
+		delete yeps_restaurant where mnum = #{mnum}
+	</delete>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+

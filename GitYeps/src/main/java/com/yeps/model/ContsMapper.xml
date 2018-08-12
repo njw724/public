@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yeps.model">
+	<select id="getContsList" resultType="ContsDTO">
+		select * from yeps_conts order by conts_count desc
+	</select>
+	
+	<select id="getContsNM" parameterType="ContsDTO" resultType="int">
+		select count(*) from yeps_conts where conts_nm = #{conts_nm}
+	</select>
+	
+	<update id="updateContsCount" parameterType="ContsDTO">
+		update yeps_conts set conts_count=conts_count+1 where conts_nm = #{conts_nm}
+	</update>
+	
+	<insert id="insertConts" parameterType="ContsDTO">
+		insert into yeps_conts (conts_nm, conts_nm_div, conts_count) values(#{conts_nm}, #{conts_nm_div}, 0)
+	</insert>
+</mapper>

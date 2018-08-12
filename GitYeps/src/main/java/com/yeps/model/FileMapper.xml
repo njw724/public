@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yeps.model">
+	<insert id="insertFile" parameterType="FileDTO">
+		insert into yeps_files values (yeps_files_seq.nextval, #{mnum, jdbcType=INTEGER}, #{rnum, jdbcType=INTEGER}, #{rvnum, jdbcType=INTEGER}, 
+										#{evnum, jdbcType=INTEGER}, #{filename}, #{origin_filename}, #{filesize}, #{file_content, jdbcType=VARCHAR}, sysdate, 'n')
+	</insert>
+	
+	<insert id="insertMainFile" parameterType="FileDTO">
+		insert into yeps_files values (yeps_files_seq.nextval, #{mnum, jdbcType=INTEGER}, #{rnum, jdbcType=INTEGER}, #{rvnum, jdbcType=INTEGER}, 
+										#{evnum, jdbcType=INTEGER}, #{filename}, #{origin_filename}, #{filesize}, #{file_content, jdbcType=VARCHAR}, sysdate, 'y')
+	</insert>
+	
+	<update id="updateFileContent" parameterType="java.util.HashMap">
+		update yeps_files set file_content = #{file_content, jdbcType=VARCHAR} where filenum = #{filenum} 
+	</update>
+	
+	<select id="getFile" parameterType="java.util.HashMap" resultType="FileDTO">
+		select * from yeps_files where filename = #{filename, jdbcType=VARCHAR} or filenum = #{filenum, jdbcType=INTEGER} order by filenum desc
+	</select>
+	
+<!-- 	<delete id="deleteFile" parameterType="int"> -->
+<!-- 		delete yeps_files where filenum = #{filenum} -->
+<!-- 	</delete> -->
+	
+	<delete id="deleteFileToFilename" parameterType="String">
+		delete yeps_files where filename = #{filename}
+	</delete>
+	
+	<select id="getfileListForMe" parameterType="java.util.HashMap" resultType="FileDTO">
+		select * from yeps_files where evnum = #{evnum} and mnum = #{mnum} order by filenum desc
+	</select>
+	
+	<select id="getFYIEventFile" parameterType="int" resultType="FileDTO">
+		select * from yeps_files where evnum = #{evnum} and ismainphoto='y'
+	</select>
+	
+	<select id="getAllEventFiles" parameterType="int" resultType="FileDTO">
+		select * from yeps_files where evnum = #{num} order by filenum desc
+	</select>
+	
+	<delete id="deleteAllFile" parameterType="int">
+		delete yeps_files where evnum = #{evnum}
+	</delete>
+	
+	<update id="changeMainPhoto" parameterType="java.util.HashMap">
+		${sql}
+	</update>
+	
+	<update id="setMainPhoto" parameterType="java.util.HashMap">
+      ${sql}
+   </update>
+   
+   <select id="isExistMainPhoto" parameterType="java.util.HashMap" resultType="int">
+      ${sql}
+   </select>
+   
+	<select id="getPagedEventFiles" parameterType="java.util.HashMap" resultType="FileDTO">
+		select * from (select rownum rn, A.* from (select * from yeps_files where evnum = #{evnum} order by filenum desc)A) where rn between #{start} and #{end}
+	</select>
+	
+	
+	
+	
+	<!-- 	여기부터 레스토랑에서 필요한 파일 요청하는 부분 -->
+	
+	
+	<resultMap type="FileDTO" id="AllFileMap">
+		<id column="filenum" property="filenum"/>
+		<result column="filename" property="filename"></result>
+		<result column="file_upload_date" property="file_upload_date"></result>
+		<result column="mnum" property="mnum"></result>
+		<result column="rnum" property="rnum"></result>
+		
+		<association javaType="MemberDTO" property="memberDTO">
+			<id column="mnum" property="mnum"></id>
+			<result column="email" property="email"></result>
+			<result column="reviewcount" property="reviewcount"></result>
+			<result column="imagecount" property="imagecount"></result>
+			<result column="nickname" property="nickname"></result>
+			<result column="address" property="address"></result>
+		</association>
+	</resultMap>
+	
+	<select id="getAllRestaurantFiles" parameterType="int" resultMap="AllFileMap">
+		select 
+				F.filenum
+				, F.filename
+				, F.file_upload_date
+				, F.mnum
+				, F.rnum
+				, M.email
+				, M.nickname
+				, M.reviewcount
+				, M.imagecount
+				, M.address
+		from yeps_files F, yeps_member M
+		where F.mnum = M.mnum and F.rnum = #{num}
+		order by filenum desc
+	</select>
+	
+	
+	<select id="getRest_fileListForMe" parameterType="java.util.HashMap" resultType="FileDTO">
+		select * from yeps_files where rnum = #{rnum} and mnum = #{mnum}
+	</select> 
+	
+	<select id="isExistRestaurantMainPhoto" parameterType="int" resultType="int">
+		select count(*) from yeps_files where rnum = #{rnum} and ismainphoto = 'y'
+	</select>
+	
+	<delete id="deleteRestaurantFile" parameterType="java.util.HashMap">
+		delete yeps_files where rnum = #{rnum} and filename = #{filename}
+	</delete>
+	
+	<select id="getPagedFileList" parameterType="java.util.HashMap" resultType="FileDTO">
+		select * from (select rownum rn, A.* from (select * from yeps_files where rnum=#{rnum} order by filenum desc)A) where rn between #{start} and #{end}
+	</select>
+	
+	<select id="getAllFileCount" parameterType="int" resultType="int">
+		select count(*) from yeps_files where rnum = #{rnum}
+	</select>
+	
+	
+	<!-- 1월 6일 민곤 추가 -->
+	<select id="getRest_fileCountForMe" parameterType="java.util.HashMap" resultType="int">
+		select count(*) from yeps_files where rnum = #{rnum} and mnum = #{mnum}
+	</select>
+	
+	<select id="getPagedFileListForMe" parameterType="java.util.HashMap" resultType="FileDTO">
+		select * from (select rownum rn, A.* from (select * from yeps_files where rnum=#{rnum} and mnum = #{mnum} order by filenum desc)A) where rn between #{start} and #{end}
+	</select>
+	
+	
+	<resultMap type="FileDTO" id="getRandomPhoto">
+		<id column="filenum" property="filenum"/>
+		<result column="filename" property="filename"></result>
+		<result column="mnum" property="mnum"></result>
+		<result column="rnum" property="rnum"></result>
+		
+		<association javaType="MemberDTO" property="memberDTO">
+			<id column="mnum" property="mnum"></id>
+			<result column="email" property="email"></result>
+			<result column="nickname" property="nickname"></result>
+		</association>
+		
+		<association javaType="RestaurantDTO" property="restaurantDTO">
+			<id column="rnum" property="rnum"></id>
+			<result column="rname" property="rname"></result>
+			<result column="price" property="price"></result>
+			<result column="category" property="category"></result>
+		</association>
+	</resultMap>
+	<select id="getRandomRestaurantPhoto" resultMap="getRandomPhoto">
+		select * from (select RT.rname, RT.category, RT.price, F.filename, F.mnum, F.rnum, M.email, M.nickname from yeps_restaurant RT, yeps_files F, yeps_member M where RT.rnum = F.rnum and F.mnum = M.mnum order by dbms_random.value) where rownum=1
+	</select>
+	
+	<delete id="deleteFilesByMemberNumber" parameterType="int">
+		delete yeps_files where mnum = #{mnum}
+	</delete>
+
+</mapper>
